@@ -13,12 +13,15 @@
 
 PASSWORD = "iBlm8NTigvru0Jr0"
 
+E_UNSUPPORTED_VERSION	= 1
+E_USAGE			= 2
+
 import sys
 
 if sys.version_info < (3, 0):
 	print("This program is designed to run under Python 3.X.")
 	print("For the original, Python 2.X version, see here: http://hacking.apcoh.com/2010/01/napi_06.html")
-	sys.exit(255)
+	sys.exit(E_UNSUPPORTED_VERSION)
 
 import hashlib, urllib.request, os
 
@@ -41,8 +44,8 @@ def f(z):
 
 
 if(len(sys.argv) != 2):
-	print("usage: %s video_file.ext" % sys.argv[1])
-	sys.exit(2)
+	print("usage: %s video_file.ext" % sys.argv[0])
+	sys.exit(E_USAGE)
 
 md5 = hashlib.md5();
 md5.update(open(sys.argv[1], 'r+b').read(10485760))
@@ -52,12 +55,12 @@ url = "http://napiprojekt.pl/unit_napisy/dl.php?l=PL&f=%s&t=%s&v=other&kolejka=f
 with urllib.request.urlopen(url) as response:
 	open("napisy.7z", "w+b").write(response.read())
 
-nazwa=sys.argv[1][:-3]+'txt'
+nazwa = sys.argv[1][:-3]+'txt'
 
-if (os.system("/usr/bin/7z x -y -so -p%s napisy.7z 2>/dev/null >\""+nazwa+"\"" % PASSWORD)):
-        print("nie ma napisa do filmu")
+if (os.system("/usr/bin/7z x -y -so -p%s napisy.7z 2>/dev/null > \"%s\"" % (PASSWORD, nazwa))):
+        print("Subtitles file not found.")
         os.remove(nazwa)        
 else:
-        print("napisy pobrano, milordzie!")
+        print("Subtitles found and downloaded.")
 
 os.remove("napisy.7z")
